@@ -49,7 +49,17 @@ public static class ListExtensions
         return v.Count > 0 ? v[v.Count - 1] : default;
     }
 
-    public static void DestroyAll<T>(this List<T> v)
+    public static void DestroyAll(this List<GameObject> v)
+    {
+        foreach(var g in v)
+        {
+            UnityEngine.Object.Destroy(g);
+        }
+
+        v.Clear();
+    }
+
+    public static void DestroyAll<T>(this List<T> v) where T : Component
     {
         var objs = v.OfType<Component>();
         

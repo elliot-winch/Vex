@@ -8,10 +8,15 @@ namespace Vex
     {
         public Player Target;
 
-        private ActionableValue mAttack;
+        private Player mAgent;
+        private Value mAttack;
 
-        public MeleeAttack(string name, ActionableValue attack) : base(name)
+        [SerializeField]
+        private int mAttackValue;
+
+        public MeleeAttack(Player agent, Value attack) : base()
         {
+            mAgent = agent;
             mAttack = attack;
         }
 
@@ -24,20 +29,30 @@ namespace Vex
                 return result;
             }
 
-            if (Target != null)
+            if(mAgent == null)
             {
-                result.FailureReason = "MeleeAttack requires Target";
+                result.FailureReason = "MeleeAttack requires an Agent";
+                result.Success = false;
+            }
+
+            if (Target == null)
+            {
+                result.FailureReason = "MeleeAttack requires a Target";
                 result.Success = false;
             }
 
             return result;
         }
 
-        public override void Execute()
+        protected override void OnExecute()
         {
-            base.Execute();
+            mAttackValue = mAttack.CurrentValue;
+            Target.Health.AddModifier(this, new LumpSumModifier( - mAttackValue));
+        }
 
-            Target.Health.AddModifier(new LumpSumModifier( - mAttack.CurrentValue), this);
+        public override string ProduceExecuteLogString()
+        {
+            return string.Format("{0} has attacked {1} for {2} damage", mAgent.Name, Target.Name, mAttackValue);
         }
     }
 }

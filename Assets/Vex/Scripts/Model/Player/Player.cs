@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 namespace Vex
 {
@@ -8,13 +6,19 @@ namespace Vex
     {
         public string Name;
 
-        public ActionableValue Health;
-        public ActionableValue MovementRange;
-        public ActionableValue ThrowingRange;
+        public Value Health;
+        public Value MovementRange;
+        public Value ThrowingRange;
 
-        public ActionableValue CurrentAP;
-        public ActionableValue TotalActions;
+        public Value CurrentAP;
+        public Value TotalActions;
 
-        public List<PlayerActionInfo> AvailableActions;
+        public List<PlayerActionInfo> AvailableActions { get; private set; } = new List<PlayerActionInfo>();
+
+        public void AddAvailableAction(PlayerActionInfo info)
+        {
+            info.SetPlayer(this);
+            AvailableActions.Add(info);
+        }
     }
 }

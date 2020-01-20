@@ -6,18 +6,34 @@ namespace Vex
 {
     public abstract class PlayerActionInfo
     {
-        public ActionableValue Cost;
+        public Value Cost;
+        public Player Player;
+
+        public void SetPlayer(Player player)
+        {
+            Player = player;
+        }
 
         public abstract GameAction NewActionInstance();
     }
 
     public class MeleeActionInfo : PlayerActionInfo
     {
-        public ActionableValue Attack;
+        public Value Attack;
 
         public override GameAction NewActionInstance()
         {
-            return new MeleeAttack("Punch", Attack);
+            return new MeleeAttack(Player, Attack);
+        }
+    }
+
+    public class BuffHealthActionInfo : PlayerActionInfo
+    {
+        public Value PercentageBuff;
+
+        public override GameAction NewActionInstance()
+        {
+            return new BuffHealth(Player, PercentageBuff);
         }
     }
 }

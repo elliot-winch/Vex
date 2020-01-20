@@ -18,33 +18,33 @@ namespace Vex
 
     public class LumpSumModifier : Modifier
     {
-        private int mModifier;
-
+        public int Amount { get; private set; }
+    
         public LumpSumModifier(int modifier, int priority = 0) : base(priority)
         {
-            mModifier = modifier;
+            Amount = modifier;
         }
 
         public override int ApplyModifier(int value)
         {
-            return mModifier + value;
+            return Amount + value;
         }
     }
 
     public class PercentageModifier : Modifier
     {
-        private float mModifier;
+        public float Percentage { get; private set; }
         private bool mRoundedUp;
 
         public PercentageModifier(float modifier, bool roundedUp, int priority = 1) : base(priority)
         {
             mRoundedUp = roundedUp;
-            mModifier = modifier;
+            Percentage = modifier;
         }
 
         public override int ApplyModifier(int value)
         {
-            float newFloatVal = mModifier * value;
+            float newFloatVal = Percentage * value;
             if (mRoundedUp)
             {
                 return Mathf.CeilToInt(newFloatVal);
@@ -57,9 +57,9 @@ namespace Vex
     }
 
     [Serializable]
-    public class ActionableValue
+    public class Value
     {
-        private List<GameAction> mActionHistory = new List<GameAction>();
+        private List<GameAction> mActionStatus = new List<GameAction>();
         private List<Modifier> mModifiers = new List<Modifier>();
         private Action<int> mOnValueChanged;
 
@@ -71,31 +71,29 @@ namespace Vex
         public int OriginalValue => mOriginalValue;
         public int CurrentValue => mCurrentValue;
 
-        public ActionableValue(int baseValue = 0)
+        public Value(int baseValue)
         {
             mOriginalValue = baseValue;
             mCurrentValue = OriginalValue;
         }
 
-        public void AddModifier(Modifier modifier, GameAction action)
+        public void AddModifier(GameAction action, Modifier modifier)
         {
-            mActionHistory.Add(action);
+            mActionStatus.Add(action);
             mModifiers.Add(modifier);
 
             CalculateCurrent();
             mOnValueChanged?.Invoke(CurrentValue);
         }
 
-        /*
-         * TODO: long lasting effects
-        public void RemoveModifier(Modifier modifier)
+        public void RemoveModifier(GameAction action, Modifier modifier)
         {
+            mActionStatus.Remove(action);
             mModifiers.Remove(modifier);
 
             CalculateCurrent();
             mOnValueChanged?.Invoke(CurrentValue);
         }
-        */
 
         public void Subscribe(Action<int> subscription)
         {

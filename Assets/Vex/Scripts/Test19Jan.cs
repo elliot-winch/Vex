@@ -13,36 +13,40 @@ public class Test19Jan : MonoBehaviour
         Player michael = new Player
         {
             Name = "Michael",
-            CurrentAP = new ActionableValue(1),
-            AvailableActions = new List<PlayerActionInfo>()
-            {
-                new MeleeActionInfo()
-                {
-                    Cost = new ActionableValue(1),
-                    Attack = new ActionableValue(2)
-                }
-            }
+            CurrentAP = new Value(1)
         };
+
+        michael.AddAvailableAction(new BuffHealthActionInfo()
+        {
+            Cost = new Value(1),
+            PercentageBuff = new Value(10)
+        });
 
         Player sarah = new Player
         {
             Name = "Sarah",
-            Health = new ActionableValue(10)
+            Health = new Value(10)
         };
 
         Player fran = new Player
         {
             Name = "Fran",
-            CurrentAP = new ActionableValue(1)
+            CurrentAP = new Value(1)
         };
 
-        MeleeAttack michaelMeleeAttack = michael.AvailableActions[0].NewActionInstance() as MeleeAttack;
+        var michaelBuffHealth = michael.AvailableActions[0].NewActionInstance() as BuffHealth;
 
-        michaelMeleeAttack.Target = sarah;
+        michaelBuffHealth.Target = sarah;
 
-        michaelMeleeAttack.Execute();
+        michaelBuffHealth.Execute();
+
+        Debug.Log(sarah.Health.CurrentValue);
+
+        michaelBuffHealth.Retract();
+
+        Debug.Log(sarah.Health.CurrentValue);
 
         GameLog.Get.DebugLog();
-        Debug.Log(sarah.Health.CurrentValue);
+
     }
 }

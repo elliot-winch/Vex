@@ -1,25 +1,47 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Vex
+﻿namespace Vex
 {
-    public class ApplyBuff : GameAction
+    public class BuffHealth : GameAction
     {
-        public Player Target { get; private set; }
-        public int BuffPercentage { get; private set; }
+        public Player Agent { get; private set; }
+        public Player Target { get; set; }
 
-        public ApplyBuff(string name, Player player, int cost, Player target, int buffPercentage) : base(name)
+        private Value mHealPercantage;
+
+        private PercentageModifier mModifier;
+        private int mHealingAmount;
+        private int mRemovedAmount;
+
+        public BuffHealth(Player player, Value healPercentage) : base()
         {
-            Target = target;
-            BuffPercentage = buffPercentage;
+            Agent = player;
+            mHealPercantage = healPercentage;
         }
 
-        public override void Execute()
+        protected override void OnExecute()
         {
-            base.Execute();
+            int prevHealth = Target.Health.CurrentValue;
 
-            //Target.Attack.AddAction(this, new PercentageModifier(BuffPercentage, roundedUp: false));
+            mModifier = new PercentageModifier(mHealPercantage.CurrentValue, roundedUp: false);
+            Target.Health.AddModifier(this, mModifier);
+
+            mHealingAmount = Target.Health.CurrentValue - prevHealth;
+        }
+
+        protected override void OnRetract()
+        {
+            int prevHealth = Target.Health.CurrentValue;
+            Target.Health.RemoveModifier(this, mModifier);
+            mRemovedAmount = Target.Health.CurrentValue - prevHealth;
+        }
+
+        public override string ProduceExecuteLogString()
+        {
+            return string.Format("{0} has healed {1} for {2} ({3} %)", Agent.Name, Target.Name, mHealingAmount, mModifier.Percentage);
+        }
+
+        public override string ProduceRetractLogString()
+        {
+            return string.Format("{0} has stopped healing {1}. {1} loses {2} hit points. ({3} %)", Agent.Name, Target.Name, mRemovedAmount, mModifier.Percentage);
         }
     }
 }
